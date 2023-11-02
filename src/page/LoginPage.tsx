@@ -1,14 +1,25 @@
 //import { useEffect, useState } from "react";
 
-import { Box, Button, Center, Input, Text } from "@chakra-ui/react";
+import {
+  AlertIcon,
+  AlertTitle,
+  Box,
+  Button,
+  Center,
+  Input,
+  Text,
+  textDecoration,
+} from "@chakra-ui/react";
 import axios from "axios";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const LogingPage: React.FC = () => {
-  const [username, setUsername] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUsername(e.target.value);
+  const navigate = useNavigate();
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
   };
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -16,15 +27,20 @@ const LogingPage: React.FC = () => {
   };
 
   const handleClickLogin = async () => {
-    const payload = { email: username, password: password };
+    const payload = { email: email, password: password };
 
     try {
       const response = await axios.post(
         "http://localhost:8080/user/login",
         payload
       );
+      if (response.data.status == "ok") {
+        localStorage.setItem("token", response.data.token);
+        navigate("/home");
+      } else {
+        alert(response.data.message);
+      }
       console.log(response.data.token);
-      localStorage.setItem("token", response.data.token);
     } catch (error) {
       console.error(error);
     }
@@ -41,7 +57,7 @@ const LogingPage: React.FC = () => {
         backgroundRepeat="no-repeat"
         backgroundSize="cover"
       >
-        <Box bgColor="#B0926A" padding="50px">
+        <Box bgColor="#B0926A" padding="50px" width="500px" borderRadius="16px">
           <Text
             display="flex"
             justifyContent="center"
@@ -52,12 +68,12 @@ const LogingPage: React.FC = () => {
           </Text>
           <Box>
             <Text pb="10px" fontWeight="700">
-              Username
+              Email
             </Text>
             <Input
               type="text"
-              value={username}
-              onChange={handleUsernameChange}
+              value={email}
+              onChange={handleEmailChange}
               placeholder="Name"
             />
             <Text py="10px" fontWeight="700">
@@ -72,6 +88,12 @@ const LogingPage: React.FC = () => {
             <Button mt="10px" onClick={handleClickLogin}>
               Submit
             </Button>
+            <Text
+              _hover={{ textDecoration: "underline" }}
+              onClick={() => navigate("/register")}
+            >
+              Don't have account yet
+            </Text>
           </Box>
         </Box>
       </Center>
