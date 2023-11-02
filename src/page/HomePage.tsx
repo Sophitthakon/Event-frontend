@@ -1,7 +1,8 @@
-import { Box, Center, Text } from "@chakra-ui/react";
+import { Box, Center, Grid, GridItem, Text } from "@chakra-ui/react";
 import NavBar from "../component/NavBar";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import EventCard from "../component/EventCard";
 
 interface Event {
   creater: string;
@@ -14,13 +15,13 @@ interface Event {
 }
 
 const HomePage: React.FC = () => {
-  const [events, setEvents] = useState<any>([]);
+  const [events, setEvents] = useState<Event[]>([]);
 
   useEffect(() => {
     const fetchEvent = async () => {
       const resp = await axios.get("http://localhost:8080/party");
       console.log(resp);
-      const events: any = resp.data;
+      const events: Event[] = resp.data;
       setEvents(events);
     };
 
@@ -30,14 +31,30 @@ const HomePage: React.FC = () => {
   return (
     <>
       <NavBar />
-
       <Center
         bgImage={
           "https://images.rawpixel.com/image_800/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbHIvdjEwODMtMDVjLmpwZw.jpg"
         }
         bgSize="cover"
         h="100vh"
-      ></Center>
+      >
+        <Grid templateColumns="repeat(5, 1fr)" gap={4}>
+          {events.map((event) => {
+            return (
+              <GridItem>
+                <EventCard
+                  title={event.title}
+                  location={event.location}
+                  date={event.date}
+                  tag={event.tag}
+                  countParti={event.countParti}
+                  max={event.max}
+                />
+              </GridItem>
+            );
+          })}
+        </Grid>
+      </Center>
     </>
   );
 };
@@ -54,3 +71,18 @@ export default HomePage;
             </Box>
           );
         })} */
+/*
+{events.map((event) => {
+        return (
+          <Box display="grid">
+            <EventCard
+              title={event.title}
+              location={event.location}
+              date={event.date}
+              tag={event.tag}
+              countParti={event.countParti}
+              max={event.max}
+            />
+          </Box>
+        );
+      })} */

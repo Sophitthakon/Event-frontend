@@ -3,8 +3,6 @@ import {
   Flex,
   HStack,
   IconButton,
-  Button,
-  Text,
   useDisclosure,
   Link,
 } from "@chakra-ui/react";
@@ -49,7 +47,7 @@ const NavBar: React.FC = () => {
               display={{ base: "none", md: "flex" }}
               pl="20px"
             >
-              <Link> My Event </Link>
+              <Link href={}> My Event </Link>
             </HStack>
           </Flex>
           <HStack spacing={8} alignItems={"center"}>
