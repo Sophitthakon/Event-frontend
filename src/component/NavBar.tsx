@@ -47,7 +47,7 @@ const NavBar: React.FC = () => {
               display={{ base: "none", md: "flex" }}
               pl="20px"
             >
-              <Link href={}> My Event </Link>
+              <Link href="/myevent"> My Event </Link>
             </HStack>
           </Flex>
           <HStack spacing={8} alignItems={"center"}>
