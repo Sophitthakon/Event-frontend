@@ -1,48 +1,35 @@
-import { AddIcon } from "@chakra-ui/icons";
+import { EditIcon } from "@chakra-ui/icons";
 import {
   Button,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
   FormControl,
   FormLabel,
   Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
   Select,
+  ModalFooter,
   useDisclosure,
 } from "@chakra-ui/react";
-import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
+import { useState } from "react";
+import { IEventDetail } from "./EventInputModal";
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
   onOpen: () => void;
-}
-export interface IEventDetail {
-  location: string;
-  title: string;
-  tag: string;
-  date: string;
-  max: string;
+  _id: string;
+  initialState: IEventDetail;
 }
 
-const EventInputModal: React.FC<Props> = () => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const initialRef = useRef(null);
-  const finalRef = useRef(null);
+const EditModal: React.FC<Props> = ({ initialState, _id }) => {
+  const { isOpen, onClose, onOpen } = useDisclosure();
+  const [event, setEvent] = useState<IEventDetail>(initialState);
 
-  const [event, setEvent] = useState<IEventDetail>({
-    location: "",
-    title: "",
-    date: "",
-    max: "",
-    tag: "",
-  });
-  useEffect(() => {});
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEvent((prev) => {
       return {
@@ -61,44 +48,30 @@ const EventInputModal: React.FC<Props> = () => {
     });
   };
 
-  const handleClickAddEvent = async () => {
+  const onClickUpdate = async () => {
     const userAuth = localStorage.getItem("token");
 
     try {
-      const party = await axios.post("http://localhost:8080/party", event, {
-        headers: {
-          Authorization: `Bearer ${userAuth}`,
-        },
-      });
-      if (party.status == 200) {
-        console.log(party.data);
-      } else {
-        alert("error");
-      }
+      const party = await axios.post(
+        `http://localhost:8080/party/update/${_id}`,
+        event,
+        {
+          headers: {
+            Authorization: `Bearer ${userAuth}`,
+          },
+        }
+      );
     } catch (error) {
-      console.error(error);
+      console.log(error);
     }
-    onClose();
   };
 
   return (
     <>
-      <Button
-        onClick={onOpen}
-        leftIcon={<AddIcon />}
-        bgColor={"#116A7B"}
-        color="gray.100"
-      >
-        Add Event
+      <Button onClick={onOpen} bgColor={"#116A7B"} color="gray.100">
+        <EditIcon /> edit
       </Button>
-
-      <Modal
-        initialFocusRef={initialRef}
-        finalFocusRef={finalRef}
-        isOpen={isOpen}
-        onClose={onClose}
-        isCentered
-      >
+      <Modal isOpen={isOpen} onClose={onClose} isCentered>
         <ModalOverlay />
         <ModalContent>
           <ModalHeader>Create your account</ModalHeader>
@@ -110,6 +83,7 @@ const EventInputModal: React.FC<Props> = () => {
                 name="location"
                 onChange={handleChange}
                 placeholder="Location"
+                value={event.location}
               />
             </FormControl>
 
@@ -119,11 +93,16 @@ const EventInputModal: React.FC<Props> = () => {
                 name="title"
                 onChange={handleChange}
                 placeholder="Event Title"
+                value={event.title}
               />
             </FormControl>
             <FormControl mt={4}>
               <FormLabel>Event Tag</FormLabel>
-              <Select placeholder="Select option" onChange={handleSelectChange}>
+              <Select
+                placeholder="Select option"
+                onChange={handleSelectChange}
+                value={event.tag}
+              >
                 <option value="Party">Party</option>
                 <option value="Gaming">Gaming</option>
                 <option value="Concert">Concert</option>
@@ -135,6 +114,7 @@ const EventInputModal: React.FC<Props> = () => {
                 type="date"
                 name="date"
                 onChange={handleChange}
+                value={event.date}
                 placeholder="DD/MM/YYYY"
               />
             </FormControl>
@@ -144,12 +124,13 @@ const EventInputModal: React.FC<Props> = () => {
                 name="max"
                 onChange={handleChange}
                 placeholder="Maximum people"
+                value={event.max}
               />
             </FormControl>
           </ModalBody>
 
           <ModalFooter>
-            <Button colorScheme="blue" mr={3} onClick={handleClickAddEvent}>
+            <Button colorScheme="blue" mr={3} onClick={onClickUpdate}>
               Save
             </Button>
           </ModalFooter>
@@ -158,60 +139,4 @@ const EventInputModal: React.FC<Props> = () => {
     </>
   );
 };
-
-export default EventInputModal;
-
-/*  3) get all parties
-route: /party
-METHOD: GET
-HEADER: {'Authorization' : `Bearer ${localstorage.getItem('token')}`}
-
-4) create payties
-route: /party
-METHOD: POST
-HEADER: {'Authorization' : `Bearer ${token}`}
-BODY: {
-    location: string,
-    title: string,
-    tag: string,
-    date: string,
-    max: string
-
-    onst items: Props[] = [
-  {
-    text: "Home",
-    href: "/",
-  },
-  {
-    text: "Picker",
-    href: "/picker",
-  },
-  {
-    text: "Eater",
-    href: "/eater",
-  },
-];
-
-interface Props {
-  text: string;
-  href: string;
-}
-
-}*/
-
-//stora state
-
-/*const [event, setEvent] = useState<IEventDetail> ({
-    location: "",
-    title: "",
-    tag: "",
-    date: "",
-    maxPeople: 0,
-  });
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEvent((prev) => {
-        return {
-            ...prev, [e.target.name]: e.target.value,
-        }
-    });
-  };*/
+export default EditModal;

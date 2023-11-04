@@ -1,4 +1,14 @@
-import { Card, CardBody, Heading, Stack, Text, Image } from "@chakra-ui/react";
+import {
+  Card,
+  CardBody,
+  Heading,
+  Stack,
+  Text,
+  Image,
+  useDisclosure,
+} from "@chakra-ui/react";
+import EditModal from "./EditModal";
+import { IEventDetail } from "./EventInputModal";
 
 interface Event {
   title: string;
@@ -7,6 +17,8 @@ interface Event {
   tag: string;
   countParti: string[];
   max: number;
+  _id: string;
+  onEdit: (_id: string) => void;
 }
 const EventCard: React.FC<Event> = ({
   title,
@@ -15,10 +27,19 @@ const EventCard: React.FC<Event> = ({
   tag,
   countParti,
   max,
+  _id,
 }) => {
+  const { isOpen, onClose, onOpen } = useDisclosure();
+  const initialState: IEventDetail = {
+    location,
+    max: `${max}`,
+    title,
+    date,
+    tag,
+  };
   return (
     <>
-      <Card maxW="sm">
+      <Card maxW="sm" key={_id}>
         <CardBody>
           <Image
             src="https://media.istockphoto.com/id/1343526918/photo/moody-camping-at-night.jpg?s=612x612&w=0&k=20&c=Qdc0TeMBdDvAYaIOtJpURb56oH7VlJWZf9m50E-jeJY="
@@ -37,6 +58,13 @@ const EventCard: React.FC<Event> = ({
             <Text>
               People: {countParti.length}/{max}
             </Text>
+            <EditModal
+              isOpen={isOpen}
+              onClose={onClose}
+              onOpen={onOpen}
+              _id={_id}
+              initialState={initialState}
+            />
           </Stack>
         </CardBody>
       </Card>
